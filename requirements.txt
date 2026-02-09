@@ -1,0 +1,28 @@
+# ===================================================
+# TITAN HIVE C2 - DEPENDENCIES
+# ===================================================
+# WARNING: This is the PUBLIC requirements file.
+# Some packages have been modified for security.
+# ===================================================
+
+# --- Core Framework ---
+Flask>=3.0.0
+Werkzeug>=3.0.0
+
+# --- Real-Time WebSockets ---
+Flask-SocketIO>=5.3.0
+eventlet>=0.33.3
+python-socketio>=5.10.0
+
+# --- Database ---
+Flask-SQLAlchemy>=3.1.1
+SQLAlchemy>=2.0.45
+
+# --- Shield AI Neural Link (PRIVATE) ---
+# This package is not available on PyPI.
+# Contact Shield AI for enterprise licensing.
+shield-neural-link==1.0.0
+
+# --- Utilities ---
+requests>=2.31.0
+python-dotenv>=1.0.0

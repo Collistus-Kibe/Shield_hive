@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>TITAN HIVE // GLOBAL DEFENSE GRID</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --bg: #050505;
+            --panel: #0F172A;
+            --accent: #0EA5E9;
+            --accent-glow: rgba(14, 165, 233, 0.3);
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --text: #F8FAFC;
+            --text-muted: #64748B;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden;
+        }
+
+        /* Layout Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: 300px 1fr 320px;
+            grid-template-rows: 60px 1fr 250px;
+            height: 100vh;
+            gap: 2px;
+        }
+
+        /* Header */
+        .header {
+            grid-column: 1 / -1;
+            background: var(--panel);
+            border-bottom: 2px solid var(--accent);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: var(--accent);
+        }
+
+        .header-status {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .blink {
+            animation: blinker 2s linear infinite;
+            color: var(--danger);
+            font-weight: bold;
+        }
+
+        @keyframes blinker {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        /* Security Badge */
+        .security-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.05));
+            border: 1px solid var(--success);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            color: var(--success);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .security-badge::before {
+            content: "🔒";
+            font-size: 12px;
+        }
+
+        /* Panels */
+        .panel {
+            background: #0b1120;
+            border: 1px solid #1e293b;
+            padding: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .panel-title {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+            letter-spacing: 1px;
+        }
+
+        /* Specific Areas */
+        .sidebar-left {
+            grid-row: 2 / -1;
+            grid-column: 1;
+            border-right: 1px solid var(--accent);
+            overflow-y: auto;
+        }
+
+        .main-map {
+            grid-row: 2;
+            grid-column: 2 / 3;
+            position: relative;
+        }
+
+        .sidebar-right {
+            grid-row: 2 / -1;
+            grid-column: 3;
+            border-left: 1px solid var(--accent);
+            overflow-y: auto;
+        }
+
+        .bottom-console {
+            grid-row: 3;
+            grid-column: 2;
+            border-top: 1px solid var(--accent);
+            background: black;
+        }
+
+        /* Log Feed */
+        .log-container {
+            height: calc(100% - 30px);
+            overflow-y: auto;
+            font-family: 'Consolas', monospace;
+            font-size: 11px;
+        }
+
+        .log-entry {
+            padding: 4px 0;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .log-crit {
+            color: var(--danger);
+        }
+
+        .log-info {
+            color: var(--accent);
+        }
+
+        /* AI Card - Enhanced */
+        .ai-card {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            border-left: 3px solid var(--accent);
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .ai-rec {
+            color: #fff;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-top: 8px;
+        }
+
+        .ai-summary {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #1e293b;
+        }
+
+        /* Threat Level Colors */
+        .threat-nominal {
+            color: var(--success) !important;
+        }
+
+        .threat-low {
+            color: var(--accent) !important;
+        }
+
+        .threat-elevated {
+            color: var(--warning) !important;
+        }
+
+        .threat-critical {
+            color: var(--danger) !important;
+            text-shadow: 0 0 10px var(--danger);
+        }
+
+        /* Agent Cards */
+        .agent-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-bottom: 10px;
+        }
+
+        .agent-card {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 12px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .agent-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px var(--accent-glow);
+            transform: translateX(-3px);
+        }
+
+        .agent-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.online {
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success);
+        }
+
+        .status-indicator.offline {
+            background: var(--danger);
+            animation: none;
+        }
+
+        .status-indicator.idle {
+            background: var(--warning);
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.7;
+                transform: scale(1.1);
+            }
+        }
+
+        .agent-id {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: 1px;
+        }
+
+        .agent-details {
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .agent-details span {
+            color: var(--text);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 9px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-online {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .badge-offline {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        .badge-idle {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+        }
+
+        .agent-meta {
+            font-size: 10px;
+            color: #475569;
+            margin-top: 6px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .empty-state::before {
+            content: "📡";
+            font-size: 32px;
+            display: block;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+
+        /* Map Override */
+        #map {
+            width: 100%;
+            height: 100%;
+            background: #000;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0b1120;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="grid">
+        <div class="header">
+            <div class="logo">TITAN HIVE <span style="font-size:10px; color:#64748B">// GLOBAL OVERWATCH</span></div>
+            <div class="header-status">
+                <div class="security-badge">Encrypted Uplink</div>
+                <div class="blink">● LIVE DATA STREAM ACTIVE</div>
+            </div>
+        </div>
+
+        <div class="panel sidebar-left">
+            <span class="panel-title">GEMINI COMMANDER</span>
+            <div class="ai-card">
+                <div style="font-size:10px; color:#64748B; margin-bottom:5px;">THREAT LEVEL ANALYSIS</div>
+                <div id="ai-level" style="font-size:18px; font-weight:bold;" class="threat-nominal">ANALYZING...</div>
+                <div id="ai-text" class="ai-rec">Initializing threat assessment...</div>
+                <div id="ai-summary" class="ai-summary">Connecting to defense grid...</div>
+            </div>
+
+            <span class="panel-title">GLOBAL METRICS</span>
+            <canvas id="threatChart" height="200"></canvas>
+        </div>
+
+        <div class="panel main-map" style="padding:0;">
+            <div id="map"></div>
+        </div>
+
+        <div class="panel sidebar-right">
+            <span class="panel-title">ACTIVE AGENTS <span id="agent-count"
+                    style="color: var(--accent); font-weight: normal;">(0)</span></span>
+            <div id="agent-grid" class="agent-grid">
+                <div class="empty-state">Scanning for agents...</div>
+            </div>
+        </div>
+
+        <div class="panel bottom-console">
+            <span class="panel-title">INTRUSION DETECTION FEED</span>
+            <div id="log-feed" class="log-container">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. INITIALIZE MAP (Dark Mode) ---
+        var map = L.map('map').setView([20, 0], 2);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap &copy; CARTO',
+            maxZoom: 19
+        }).addTo(map);
+
+        // Store agent markers for map updates
+        var agentMarkers = {};
+
+        // --- 2. WEBSOCKET CONNECTION ---
+        var socket = io();
+
+        socket.on('connect', function () {
+            addLog("SYSTEM", "Encrypted uplink established with Titan Hive Server.", "log-info");
+        });
+
+        socket.on('disconnect', function () {
+            addLog("SYSTEM", "⚠️ Connection lost. Attempting reconnect...", "log-crit");
+        });
+
+        // Handle New Threats
+        socket.on('new_threat', function (data) {
+            L.circleMarker([data.lat, data.lon], {
+                color: '#EF4444',
+                fillColor: '#EF4444',
+                fillOpacity: 0.8,
+                radius: 8
+            }).addTo(map).bindPopup(`<b>${data.type}</b><br>${data.details}`);
+
+            addLog(data.ip, `THREAT DETECTED: ${data.type} (Score: ${data.score})`, "log-crit");
+            updateAI();
+        });
+
+        // Handle Heartbeats (real-time via websocket)
+        socket.on('heartbeat', function (data) {
+            addLog(data.agent_id || data.ip, "Heartbeat received", "log-info");
+            updateAgents(); // Refresh agent list
+        });
+
+        // --- 3. UI HELPERS ---
+        function addLog(source, msg, cssClass) {
+            const feed = document.getElementById('log-feed');
+            const time = new Date().toLocaleTimeString();
+            feed.innerHTML = `<div class="log-entry ${cssClass}">[${time}] <b>${source}</b>: ${msg}</div>` + feed.innerHTML;
+
+            // Keep log manageable
+            if (feed.children.length > 100) {
+                feed.removeChild(feed.lastChild);
+            }
+        }
+
+        // --- 4. AI BRIEF UPDATE ---
+        async function updateAI() {
+            try {
+                const res = await fetch('/api/ai_brief');
+                const data = await res.json();
+
+                const levelEl = document.getElementById('ai-level');
+                const textEl = document.getElementById('ai-text');
+                const summaryEl = document.getElementById('ai-summary');
+
+                if (data.threat_level) {
+                    levelEl.innerText = data.threat_level;
+                    levelEl.className = 'threat-' + data.threat_level.toLowerCase();
+                }
+
+                if (data.recommendation) {
+                    textEl.innerText = data.recommendation;
+                }
+
+                if (data.summary) {
+                    summaryEl.innerText = data.summary;
+                }
+            } catch (err) {
+                console.error('AI Brief fetch error:', err);
+            }
+        }
+
+        // --- 5. AGENTS LIST UPDATE ---
+        async function updateAgents() {
+            try {
+                const res = await fetch('/api/agents');
+                const data = await res.json();
+
+                const grid = document.getElementById('agent-grid');
+                const countEl = document.getElementById('agent-count');
+
+                if (!data.agents || data.agents.length === 0) {
+                    grid.innerHTML = '<div class="empty-state">No agents connected</div>';
+                    countEl.innerText = '(0)';
+                    return;
+                }
+
+                countEl.innerText = `(${data.agents.length})`;
+
+                grid.innerHTML = data.agents.map(agent => {
+                    const status = agent.status || 'Unknown';
+                    const statusLower = status.toLowerCase();
+                    const statusClass = statusLower === 'online' ? 'online' : (statusLower === 'idle' ? 'idle' : 'offline');
+                    const badgeClass = statusLower === 'online' ? 'badge-online' : (statusLower === 'idle' ? 'badge-idle' : 'badge-offline');
+
+                    // Format last seen
+                    let lastSeen = 'Unknown';
+                    if (agent.last_seen) {
+                        const date = new Date(agent.last_seen);
+                        lastSeen = date.toLocaleString();
+                    }
+
+                    return `
+                    <div class="agent-card">
+                        <div class="agent-header">
+                            <div class="status-indicator ${statusClass}"></div>
+                            <div class="agent-id">${agent.agent_id || 'UNKNOWN'}</div>
+                        </div>
+                        <div class="agent-details">
+                            IP: <span>${agent.ip_address || 'N/A'}</span><br>
+                            Location: <span>${agent.location || 'Unknown'}</span><br>
+                            Status: <span class="badge ${badgeClass}">${status}</span>
+                        </div>
+                        <div class="agent-meta">Last Seen: ${lastSeen}</div>
+                    </div>
+                `;
+                }).join('');
+
+                // Update map markers for agents
+                updateAgentMarkers(data.agents);
+
+            } catch (err) {
+                console.error('Agents fetch error:', err);
+            }
+        }
+
+        // --- 6. MAP AGENT MARKERS ---
+        function updateAgentMarkers(agents) {
+            // Simple location mapping (expand as needed)
+            const locationCoords = {
+                'US-East': [40.7128, -74.0060],
+                'US-West': [37.7749, -122.4194],
+                'EU-West': [51.5074, -0.1278],
+                'EU-Central': [52.5200, 13.4050],
+                'Asia-East': [35.6762, 139.6503],
+                'Unknown': [0, 0]
+            };
+
+            agents.forEach(agent => {
+                if (agent.status === 'Online') {
+                    const coords = locationCoords[agent.location] || locationCoords['Unknown'];
+
+                    if (!agentMarkers[agent.agent_id]) {
+                        agentMarkers[agent.agent_id] = L.circleMarker(coords, {
+                            color: '#10B981',
+                            fillColor: '#10B981',
+                            fillOpacity: 0.6,
+                            radius: 6
+                        }).addTo(map).bindPopup(`<b>${agent.agent_id}</b><br>IP: ${agent.ip_address}<br>Status: ${agent.status}`);
+                    }
+                }
+            });
+        }
+
+        // --- 7. INITIAL LOAD & POLLING ---
+        updateAI();
+        updateAgents();
+
+        // Poll every 3 seconds for live updates
+        setInterval(updateAI, 5000);
+        setInterval(updateAgents, 3000);
+
+        // --- 8. CHARTS ---
+        const ctx = document.getElementById('threatChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Clean', 'Malware', 'Phishing'],
+                datasets: [{
+                    data: [85, 10, 5],
+                    backgroundColor: ['#0EA5E9', '#EF4444', '#F59E0B'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: '#94A3B8', padding: 15, font: { size: 11 } }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,68 @@
+{
+    "9695cf4566ddf878a69c3d419e0da4eea87b0f24261ad8e79a3a9c4a9885429c": {
+        "threat_name": "cmd.exe",
+        "reports": [
+            "2025-11-13T11:10:39.977719",
+            "2025-11-13T11:11:41.446635",
+            "2025-11-13T11:13:45.045340",
+            "2025-11-13T11:14:05.546379",
+            "2025-11-13T21:01:37.626564",
+            "2025-11-13T21:23:46.503558",
+            "2025-11-13T21:25:11.841927",
+            "2025-11-13T21:51:11.191551",
+            "2025-11-13T21:51:31.555542"
+        ],
+        "validated": false,
+        "report_count": 9
+    },
+    "0ff6f2c94bc7e2833a5f7e16de1622e5dba70396f31c7d5f56381870317e8c46": {
+        "threat_name": "powershell.exe",
+        "reports": [
+            "2025-11-13T11:11:00.703681",
+            "2025-11-13T11:13:24.677400",
+            "2025-11-15T12:17:15.401196"
+        ],
+        "validated": false,
+        "report_count": 3
+    },
+    "24fb28a564e0b710eb52ddfbb41bb4ccd908e5b26961f63bb882b75097f41654": {
+        "threat_name": "SearchProtocolHost.exe",
+        "reports": [
+            "2025-11-13T11:11:21.153382"
+        ],
+        "validated": false,
+        "report_count": 1
+    },
+    "1d241ec0901b9766286707b236d9287c49024a6f5509dfaeb27284fda810a21f": {
+        "threat_name": "Docker Desktop.exe",
+        "reports": [
+            "2025-11-13T11:12:03.475969"
+        ],
+        "validated": false,
+        "report_count": 1
+    },
+    "e87114569664c89004107b5dfd33efaf580a4a3d6e65a5112e16e0a3373cdc25": {
+        "threat_name": "SearchFilterHost.exe",
+        "reports": [
+            "2025-11-13T11:13:04.334693"
+        ],
+        "validated": false,
+        "report_count": 1
+    },
+    "a7b2397cd39f210d134fd5a51da4dab5c17622ce82f099baa9296b8a05eb1fc8": {
+        "threat_name": "CodeSetup-stable-ac4cbdf48759c7d8c3eb91ffe6bb04316e263c57.tmp",
+        "reports": [
+            "2025-11-13T11:14:26.068580"
+        ],
+        "validated": false,
+        "report_count": 1
+    },
+    "e1c6f43bba8ec9b2ac3c92bff610a11a7c35567191345750b8511bef35f5794f": {
+        "threat_name": "TrustedInstaller.exe",
+        "reports": [
+            "2025-11-15T12:19:25.804284"
+        ],
+        "validated": false,
+        "report_count": 1
+    }
+}
