@@ -1,41 +1,59 @@
+
+![Uploading ChatGPT Image Feb 10, 2026, 11_34_58 AM.png…]()
+
 # 🛡️ Shield AI: Titan Hive (C2)
 
-> **⚠️ SECURITY NOTICE: JUDGE EVALUATION BUILD**
-> This repository contains the **Reference Source Code** for the Titan Hive Command & Control (C2) server.
-> To protect the integrity of the active Shield Defense Grid, critical cryptographic keys, production API secrets, and the core "Ghost Protocol" routing engine have been **redacted or decoupled** in this public release.
+> **⚠️ JUDGE EVALUATION NOTICE**
+> This repository serves as the **architectural reference** for the Shield AI backend.
+> To test the system, please download the **compiled "Judge Edition" application** from the [Releases] section or the provided demo package.
 
 ---
 
-## 🦅 Overview
-**Titan Hive** is the central "Brain" of the Shield AI ecosystem. It acts as a sovereign, self-hosted Command & Control center that orchestrates a swarm of **Shield Sentinel** nodes.
+## 🦅 The Central "Brain"
+**Titan Hive** is the sovereign Command & Control (C2) server for the Shield Defense Ecosystem. Unlike traditional centralized servers that simply log data, the Hive acts as a living, cognitive entity powered by **Google Gemini 3**.
 
-Powered by **Google Gemini 3**, the Hive doesn't just log threats—it understands them. It ingests telemetry from thousands of endpoints, uses Generative AI to analyze attack patterns in real-time, and issues autonomous defense commands to the fleet.
+It orchestrates a decentralized swarm of **Shield Sentinel** nodes, ingesting raw telemetry from thousands of endpoints and converting it into actionable, military-grade threat intelligence in real-time.
 
-## 🔒 Security & Privacy Architecture
-We treat our infrastructure as a fortress. To prevent reverse-engineering of our active defense capabilities, this repository is structured as a **"Glass Box"** for evaluation:
+---
 
-* **Code Transparency:** Judges can review the architectural logic, Flask route structures, and Gemini 3 integration patterns.
-* **Operational Security:** The live, weaponized defense modules (used for active countermeasures) are hosted on our private air-gapped internal repo.
-* **Judge Edition Binary:** For a fully functional, easy-to-test experience, we have provided a compiled **"Judge Edition" executable** (with a strict 60-minute security session limit) in the releases section.
+## 🚀 Core Capabilities
 
-## 🚀 Key Features
-* **🧠 Cognitive Threat Analysis:** Integrated with **Google Gemini 3** to provide zero-shot analysis of suspicious process behavior.
-* **👻 Ghost Protocol Compliance:** Enforces privacy by default. All incoming Sentinel IP addresses are cryptographically masked before storage.
-* **🌍 Live Threat Map:** Real-time WebSocket visualization of active nodes and intercepted attacks.
-* **⚡ DePIN Ready:** Built-in logic for the **$SHIELD** utility token, tracking "Proof-of-Protection" uptime for future rewards.
+### 🧠 1. Cognitive Threat Analysis (Gemini 3)
+The Hive integrates directly with Google's Gemini 3 Pro model to replace the human security analyst.
+* **Zero-Shot Analysis:** Instantly evaluates unknown processes based on behavior, not just file signatures.
+* **Intent Decoupling:** Distinguishes between benign tools (e.g., a game installer) and malicious actors (e.g., ransomware), even if they use similar system calls.
+* **Natural Language Reporting:** Generates human-readable threat summaries for the dashboard.
 
-## 🛠️ Installation & Testing
-**Recommended for Judges:**
-Please download the **Pre-Compiled Demo (Titan_Hive_Judge_Edition.exe)** from the release tab or the provided Google Drive link. This version comes pre-packaged with all dependencies and the "Judge Security Protocol" active.
+### 👻 2. The Ghost Protocol (Privacy Architecture)
+We believe security shouldn't cost you your privacy. The Hive enforces a "Trust No One" data policy:
+* **Identity Masking:** All incoming Sentinel IP addresses are cryptographically hashed and masked *before* hitting the database.
+* **Tor Integration:** Supports routing command traffic through the Tor network to prevent geolocation tracking of defense nodes.
 
-**For Code Review:**
-If you wish to inspect the codebase:
-```bash
-# Clone the repository
-git clone [https://github.com/Collistus-Kibe/Shield_hive.git](https://github.com/Collistus-Kibe/Shield_hive.git)
+### 🌍 3. Live Swarm Visualization
+The dashboard provides a real-time "God's Eye View" of the global defense grid.
+* **WebSocket Telemetry:** Low-latency (<50ms) updates of node health and active threats.
+* **Geo-Fencing:** Visualizes attack vectors on a 3D globe without compromising user anonymity.
 
-# Install dependencies (Note: 'shield-neural-link' is a private internal lib)
-pip install -r requirements.txt
+### 💎 4. DePIN Economy (Proof-of-Protection)
+The Hive serves as the validator for the **$SHIELD** utility token ecosystem.
+* **Uptime Verification:** Cryptographically validates "Proof-of-Protection" for connected Sentinels.
+* **Trust Scoring:** Assigns dynamic reputation scores to nodes based on the accuracy of their threat reports, preventing network spam.
 
-# Run the reference server
-python run_hive.py
+---
+
+## 🏗️ System Architecture
+The Titan Hive is built on a high-concurrency **Flask + Socket.IO** asynchronous backbone, designed to handle thousands of simultaneous Sentinel connections.
+
+| Component | Technology | Purpose |
+| :--- | :--- | :--- |
+| **Core Engine** | Python 3.12 (Flask) | REST API & Event Loops |
+| **Real-Time Layer** | Flask-SocketIO | Bi-directional Sentinel Communication |
+| **AI Logic** | Google Gemini 3 API | Threat Classification & Reasoning |
+| **Database** | SQLite / SQLAlchemy | Encrypted Event Persistence |
+
+---
+
+## 🛡️ "Defense in Depth"
+Shield AI represents a shift from passive antivirus software to active, coordinated cyber-defense. The Titan Hive is the intelligence that makes this shift possible.
+
+*Submission for the Google Gemini 3 Hackathon.*
