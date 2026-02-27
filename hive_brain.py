@@ -4,7 +4,7 @@ import os
 
 # Configure your API Key here or in Environment Variables
 # If this is empty, the system automatically falls back to "Offline Mode"
-GEMINI_API_KEY = "AIzaSyDRtKwdlQU9Jr8RRVlTUk2lIi5Z1I8O0nQ"
+GEMINI_API_KEY = ""
 
 def analyze_threat_with_gemini(threat_name, reasons, file_hash):
     """
